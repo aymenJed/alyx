@@ -1,0 +1,47 @@
+{
+  "name" : "Nouveau Diagramme",
+  "version" : "1.0",
+  "classes" : [ {
+    "id" : "a8b71dda-23b5-4e72-a786-8fe81b59eddc",
+    "name" : "Client",
+    "x" : 183.81916376656056,
+    "y" : 185.3983820643033,
+    "width" : 200.0,
+    "height" : 100.0,
+    "attributes" : [ {
+      "name" : "nom",
+      "type" : "String",
+      "visibility" : "PRIVATE"
+    } ],
+    "methods" : [ ],
+    "packageName" : "com.alyx.core.tier",
+    "interface" : false,
+    "abstract" : false
+  }, {
+    "id" : "a371c8cf-50a0-41a4-969d-9d921b7bf16d",
+    "name" : "Compte",
+    "x" : 583.3226767240479,
+    "y" : 68.37736661987022,
+    "width" : 200.0,
+    "height" : 100.0,
+    "attributes" : [ {
+      "name" : "accNumber",
+      "type" : "String",
+      "visibility" : "PRIVATE"
+    } ],
+    "methods" : [ ],
+    "packageName" : "com.alyx.core.acc",
+    "interface" : false,
+    "abstract" : false
+  } ],
+  "relations" : [ {
+    "id" : "70e9ed26-9fff-45da-a6eb-da3aa8f42c7d",
+    "sourceId" : "a371c8cf-50a0-41a4-969d-9d921b7bf16d",
+    "targetId" : "a8b71dda-23b5-4e72-a786-8fe81b59eddc",
+    "type" : "AGGREGATION",
+    "label" : "",
+    "sourceMultiplicity" : "ZERO_ONE",
+    "targetMultiplicity" : "ZERO_MANY",
+    "ownerSide" : "SOURCE"
+  } ]
+}
