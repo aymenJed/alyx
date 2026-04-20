@@ -1,0 +1,48 @@
+package com.alyx.core.market.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+
+/**
+ * Requête de mise à jour pour {@link Bond}.
+ * Généré automatiquement — ne pas modifier manuellement.
+ */
+public record UpdateBondRequest(
+    @NotBlank String bondCode,
+    @NotBlank String isinCode,
+    @NotBlank String issuerCode,
+    String issuerName,
+    @NotBlank String bondType,
+    String currency,
+    String paymentCurrency,
+    @NotNull BigDecimal nominalValue,
+    BigDecimal issuePrice,
+    BigDecimal redemptionPrice,
+    BigDecimal interestRate,
+    BigDecimal minimumRate,
+    BigDecimal marginalRate,
+    BigDecimal spread,
+    String dayCountConvention,
+    @NotNull LocalDate issueDate,
+    LocalDate valueDate,
+    @NotNull LocalDate maturityDate,
+    Integer durationMonths,
+    @NotNull Integer couponsPerYear,
+    @NotBlank String couponFrequency,
+    @NotBlank String rateType,
+    @NotBlank String repaymentType,
+    String repaymentMethod,
+    @NotNull BigDecimal issueAmount,
+    BigDecimal outstandingAmount,
+    @NotNull Long quantity,
+    String guarantee,
+    String rating,
+    String listingStatus,
+    String listingMarket,
+    Map<String,Object> subscriptionParams,
+    Map<String,Object> guaranteeParams,
+    @NotBlank String status,
+    @NotBlank String isActive
+) {}

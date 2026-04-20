@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn compile:*)",
+      "Bash(npx ng:*)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(echo \"Backend PID: $!\")",
+      "Bash(npm start:*)",
+      "Bash(echo \"Frontend PID: $!\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:9090/api/v1/auth/login -X POST -H \"Content-Type: application/json\" -d '{\"username\":\"admin\",\"password\":\"wrong\"}')",
+      "Bash(curl -s -w \"\\\\nHTTP %{http_code}\" http://localhost:9090/api/v1/auth/login -X POST -H \"Content-Type: application/json\" -d '{\"username\":\"admin\",\"password\":\"wrong\"}')",
+      "Bash(netstat -ano)",
+      "Bash(netstat -tlnp)",
+      "Bash(mvn clean:*)",
+      "Bash(mvn spring-boot:run -Dspring-boot.run.jvmArguments=\"-Dspring.profiles.active=dev\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:9090/api/v1/metadata/screens/SCR_ROLES)",
+      "Bash(curl -s -X POST http://localhost:9090/api/v1/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"username\\\\\":\\\\\"admin\\\\\",\\\\\"password\\\\\":\\\\\"admin123\\\\\"}\")",
+      "Bash(curl -s -w '\\\\nHTTP_STATUS:%{http_code}' http://localhost:9090/api/v1/metadata/screens/SCR_ROLES -H 'Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9VU0VSIl0sInN1YiI6ImFkbWluIiwiaWF0IjoxNzc2NjI0MjY2LCJleHAiOjE3NzY3MTA2NjZ9.r7PCuAJ7Qdlq1T66pvgim_es9ptL8kytM6SrbOYOk45QOYg0z5S-5IWCx6cDe8MI')",
+      "Bash(curl -s http://localhost:9090/api/v1/metadata/screens/SCR_ROLES -H 'Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9VU0VSIl0sInN1YiI6ImFkbWluIiwiaWF0IjoxNzc2NjI0MjY2LCJleHAiOjE3NzY3MTA2NjZ9.r7PCuAJ7Qdlq1T66pvgim_es9ptL8kytM6SrbOYOk45QOYg0z5S-5IWCx6cDe8MI')",
+      "Bash(mvn spring-boot:run -Dspring-boot.run.arguments=\"--logging.level.com.alyx=DEBUG --logging.level.org.springframework.web=DEBUG\")",
+      "Bash(mvn spring-boot:run -Dspring-boot.run.jvmArguments=\"-Dlogging.level.com.alyx=DEBUG -Dlogging.level.org.hibernate.SQL=DEBUG -Dlogging.level.org.springframework.web=WARN\")",
+      "Bash(echo \"Launched PID=$!\")",
+      "Bash(mkdir -p /tmp/alyx)",
+      "Bash(mvn spring-boot:run \"-Dspring-boot.run.jvmArguments=-Dlogging.level.com.alyx=DEBUG -Dlogging.level.org.hibernate.SQL=DEBUG\")",
+      "Bash(echo \"PID=$!\")",
+      "Bash(findstr \":9090\")",
+      "Bash(taskkill /PID 11080 /F)",
+      "Bash(cmd /c \"taskkill /PID 11080 /F\")",
+      "Bash(mvn spring-boot:run \"-Dspring-boot.run.jvmArguments=-Dlogging.level.com.alyx=DEBUG -Dlogging.level.org.hibernate.SQL=DEBUG -Dlogging.level.org.springframework.web.servlet.DispatcherServlet=DEBUG\")",
+      "Bash(echo \"Started background PID=$!\")",
+      "Bash(cmd /c \"netstat -ano | findstr :9090\")",
+      "Bash(echo \"PID=$!\" sleep 22 grep \"Started\\\\|ERROR\\\\|Exception\" /tmp/alyx/app.log)",
+      "Bash(cmd /c \"wmic process where \\\\\"name='java.exe'\\\\\" get ProcessId,CommandLine 2>nul | findstr /i maven\")",
+      "Bash(curl -s -X POST http://localhost:9090/api/v1/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"username\\\\\":\\\\\"admin\\\\\",\\\\\"password\\\\\":\\\\\"admin\\\\\"}\")",
+      "Bash(curl -sv http://localhost:9090/api/v1/metadata/screens/SCR_ROLES -H 'Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9VU0VSIl0sInN1YiI6ImFkbWluIiwiaWF0IjoxNzc2NjI0ODE2LCJleHAiOjE3NzY3MTEyMTZ9.go85ffj3IOPiCSJKXJdybUe8HVGgkMNYKNbWCstxnHQCupMncZd_u9oPzqqnb7Xi')",
+      "Bash(cmd /c \"taskkill /PID 11080 /F /T\")",
+      "Bash(echo \"Maven started with PID $!\")",
+      "Bash(cmd /c \"wmic process where \\\\\"name='java.exe'\\\\\" get ProcessId,CommandLine 2>nul\")"
+    ]
+  }
+}

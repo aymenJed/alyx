@@ -1,0 +1,55 @@
+package com.alyx.common.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
+/**
+ * Abstract base entity providing standard audit fields for all entities.
+ * <p>
+ * – {@code id}         : clé primaire auto-générée (IDENTITY)<br>
+ * – {@code createdAt}  : date de création (non modifiable)<br>
+ * – {@code updatedAt}  : date de dernière mise à jour<br>
+ * – {@code createdBy}  : utilisateur créateur (non modifiable)<br>
+ * – {@code updatedBy}  : dernier utilisateur modificateur<br>
+ * <p>
+ * Les champs d'audit sont en lecture seule (pas de setter) :
+ * ils sont remplis automatiquement par {@link AuditingEntityListener}.
+ * <p>
+ * Les sous-classes peuvent surcharger le nom de la colonne {@code id}
+ * via {@code @AttributeOverride(name = "id", column = @Column(name = "..."))}.
+ */
+@Getter
+@NoArgsConstructor
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @CreatedBy
+    @Column(name = "created_by", updatable = false, length = 50)
+    private String createdBy;
+
+    @LastModifiedBy
+    @Column(name = "updated_by", length = 50)
+    private String updatedBy;
+}

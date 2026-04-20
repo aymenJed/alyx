@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: alyx-app-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/alyxdb
+    username: ${DB_USERNAME:alyx_user}
+    password: ${DB_PASSWORD:sa}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: AlyxPostgresPool
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none   # Schéma géré par scripts DDL (database/ddl/), pas par Hibernate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=5m
+
+  security:
+    jwt:
+      secret: ${JWT_SECRET:alyx-super-secret-key-change-in-production-256bits}
+      expiration: 86400000   # 24h en ms
+
+server:
+  port: 9090
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html
+
+logging:
+  level:
+    com.alyx: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+alyx:
+  cors:
+    allowed-origins: "http://localhost:4200,http://localhost:4201,https://alyx.umoa.internal"
+  metadata:
+    cache-ttl-minutes: 5
+    menu-cache-ttl-minutes: 10

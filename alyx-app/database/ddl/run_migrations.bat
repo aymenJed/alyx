@@ -1,0 +1,1 @@
+psql -U alyx_user -d alyxdb -f 00_master_install.sql
