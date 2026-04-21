@@ -108,10 +108,16 @@ public class MetadataService {
                 c.getValidationRegex(),
                 c.getValidationMsg(),
                 c.getOptionsSource(),
-                c.getOptionsJson(),
+                toOptionsList(c.getOptionsJson()),
                 c.getVisibilityRule(),
                 c.getFormatPattern()
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> toOptionsList(Object raw) {
+        if (raw instanceof List<?> list) return (List<Map<String, Object>>) list;
+        return null; // {} or null → no static options
     }
 
     // =========================================================

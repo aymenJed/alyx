@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -71,7 +70,7 @@ public class UiComponent extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "OPTIONS_JSON", columnDefinition = "jsonb")
-    private List<Map<String, Object>> optionsJson;
+    private Object optionsJson;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "VISIBILITY_RULE", columnDefinition = "jsonb")
@@ -100,7 +99,7 @@ public class UiComponent extends BaseEntity {
     public String getValidationRegex()                { return validationRegex; }
     public String getValidationMsg()                  { return validationMsg; }
     public String getOptionsSource()                  { return optionsSource; }
-    public List<Map<String, Object>> getOptionsJson() { return optionsJson; }
+    public Object getOptionsJson() { return optionsJson; }
     public Map<String, Object> getVisibilityRule()    { return visibilityRule; }
     public String getFormatPattern()                  { return formatPattern; }
 
@@ -123,7 +122,7 @@ public class UiComponent extends BaseEntity {
     public void setValidationRegex(String validationRegex)           { this.validationRegex = validationRegex; }
     public void setValidationMsg(String validationMsg)               { this.validationMsg = validationMsg; }
     public void setOptionsSource(String optionsSource)               { this.optionsSource = optionsSource; }
-    public void setOptionsJson(List<Map<String, Object>> optionsJson) { this.optionsJson = optionsJson; }
+    public void setOptionsJson(Object optionsJson) { this.optionsJson = optionsJson; }
     public void setVisibilityRule(Map<String, Object> visibilityRule) { this.visibilityRule = visibilityRule; }
     public void setFormatPattern(String formatPattern)               { this.formatPattern = formatPattern; }
 }
