@@ -2,4 +2,5 @@
 <typeInfoHistroy>
     <typeInfo handle="=backend/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.alyx.core.common{PagedResponse.java[PagedResponse" modifiers="16777217" timestamp="1776005763650"/>
     <typeInfo handle="=backend/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.alyx.security.entity{Role.java[Role" modifiers="1" timestamp="1775979548170"/>
+    <typeInfo handle="=backend/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.alyx.core.tier.repository{ClientRepository.java[ClientRepository" modifiers="513" timestamp="1776730544871"/>
 </typeInfoHistroy>
