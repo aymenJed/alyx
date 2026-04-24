@@ -84,6 +84,22 @@ SET client_min_messages = WARNING;
 -- \echo '[08] Migration audit columns (base existante)...'
 -- \ir 08_audit_columns.sql
 
+-- -------------------------------------------------------
+-- ADMINISTRATION DE LA SÉCURITÉ (Carthago)
+-- -------------------------------------------------------
+\echo ''
+\echo '[20] Modernisation UI GRID (ui_action, ui_column)...'
+\ir 20_grid_screen_modern_ui.sql
+
+\echo '[21] Création table UI_LABEL (i18n)...'
+\ir 21_ui_label.sql
+
+\echo '[22] Écran FORM avec sections (SCR_BOND_FORM)...'
+\ir 22_form_screen_sections.sql
+
+\echo '[23] Module Administration de la sécurité (A.1→A.4)...'
+\ir 23_administration_securite.sql
+
 \echo ''
 \echo '============================================================'
 \echo 'Installation terminée avec succès.'

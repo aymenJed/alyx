@@ -4,6 +4,9 @@ import com.alyx.metadata.dto.*;
 import com.alyx.metadata.entity.*;
 import com.alyx.metadata.exception.ScreenNotFoundException;
 import com.alyx.metadata.repository.*;
+import com.alyx.metadata.repository.UiActionRepository;
+import com.alyx.metadata.repository.UiColumnRepository;
+import com.alyx.metadata.repository.UiLabelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,15 +30,24 @@ public class MetadataService {
     private final UiComponentRepository    componentRepo;
     private final AppMenuRepository        menuRepo;
     private final UiUserShortcutRepository shortcutRepo;
+    private final UiActionRepository       actionRepo;
+    private final UiColumnRepository       columnRepo;
+    private final UiLabelRepository        labelRepo;
 
     public MetadataService(UiScreenRepository screenRepo,
                            UiComponentRepository componentRepo,
                            AppMenuRepository menuRepo,
-                           UiUserShortcutRepository shortcutRepo) {
-        this.screenRepo   = screenRepo;
+                           UiUserShortcutRepository shortcutRepo,
+                           UiActionRepository actionRepo,
+                           UiColumnRepository columnRepo,
+                           UiLabelRepository labelRepo) {
+        this.screenRepo    = screenRepo;
         this.componentRepo = componentRepo;
-        this.menuRepo     = menuRepo;
-        this.shortcutRepo = shortcutRepo;
+        this.menuRepo      = menuRepo;
+        this.shortcutRepo  = shortcutRepo;
+        this.actionRepo    = actionRepo;
+        this.columnRepo    = columnRepo;
+        this.labelRepo     = labelRepo;
     }
 
     // =========================================================
@@ -51,30 +63,36 @@ public class MetadataService {
         log.info("Building screen metadata for: {}", screenCode);
         
         UiScreen screen = screenRepo
-                .findByCodeAndIsActive(screenCode, "Y")
+                .findByCodeAndIsActive(screenCode, true)
                 .orElseThrow(() -> new ScreenNotFoundException(screenCode));
 
         log.info("Found screen: id={}, code={}, title={}", screen.getId(), screen.getCode(), screen.getTitle());
 
-        List<ComponentDto> components = new ArrayList<>();
+        List<ComponentDto> components = componentRepo
+                .findByScreenIdOrderByDisplayOrderAsc(screen.getId()).stream()
+                .filter(c -> Boolean.TRUE.equals(c.getIsVisible()))
+                .map(this::toComponentDto)
+                .toList();
 
-        try {
-            var rawComponents = componentRepo.findByScreenIdOrderByDisplayOrderAsc(screen.getId());
-            log.info("Raw components count: {}", rawComponents.size());
-            
-            for (var comp : rawComponents) {
-                if ("Y".equals(comp.getIsVisible())) {
-                    components.add(toComponentDto(comp));
-                }
-            }
-            log.info("Filtered to {} visible components", components.size());
-        } catch (Exception e) {
-            log.error("Error fetching components: {}", e.getMessage(), e);
-            throw e;
-        }
+        List<ActionDto> actions = actionRepo
+                .findByScreen_IdOrderByDisplayOrderAsc(screen.getId()).stream()
+                .map(this::toActionDto)
+                .toList();
 
-        log.info("Creating ScreenMetadataDto...");
-        
+        List<ColumnDto> columns = columnRepo
+                .findByScreen_IdOrderByDisplayOrderAsc(screen.getId()).stream()
+                .map(this::toColumnDto)
+                .toList();
+
+        // Labels i18n (langue par défaut : fr)
+        Map<String, String> labels = labelRepo
+                .findByScreenCodeAndLanguageOrderByFieldKey(screen.getCode(), "fr").stream()
+                .filter(l -> l.getFieldKey() != null)
+                .collect(Collectors.toMap(l -> l.getFieldKey(), l -> l.getLabel()));
+
+        log.info("Screen {} — {} components, {} actions, {} columns", screen.getCode(),
+                components.size(), actions.size(), columns.size());
+
         return new ScreenMetadataDto(
                 screen.getScreenId(),
                 screen.getCode(),
@@ -82,35 +100,105 @@ public class MetadataService {
                 screen.getDescription(),
                 screen.getTemplateType(),
                 screen.getApiBaseUrl(),
-                null, // permissions
-                null, // gridConfig
-                null, // analyticsConfig
-                components
+                // View communes
+                screen.getCaption(),
+                screen.getWidth(),
+                screen.getHeight(),
+                screen.getRefreshTime(),
+                Boolean.TRUE.equals(screen.getServerCache()),
+                Boolean.TRUE.equals(screen.getClientCache()),
+                Boolean.TRUE.equals(screen.getMaximized()),
+                // EntityInputView
+                screen.getEntityClass(),
+                screen.getCriteria(),
+                screen.getOrderBy(),
+                screen.getCompositionLayout(),
+                screen.getActionLayout(),
+                screen.getAutoSaveTime(),
+                Boolean.TRUE.equals(screen.getHasNavigationBar()),
+                // SplitView
+                Boolean.TRUE.equals(screen.getIsSplitView()),
+                screen.getSizeShare(),
+                screen.getOrientation(),
+                // GridView
+                screen.getPageSize(),
+                Boolean.TRUE.equals(screen.getCheckboxSelection()),
+                Boolean.TRUE.equals(screen.getWordWrap()),
+                screen.getRowHeight(),
+                Boolean.TRUE.equals(screen.getDisableReportButton()),
+                screen.getActionRenderer(),
+                // Analytics
+                screen.getAnalyticsConfig(),
+                // Sous-modèles
+                components,
+                actions,
+                columns,
+                labels
         );
     }
 
     private ComponentDto toComponentDto(UiComponent c) {
         return new ComponentDto(
-                c.getComponentId(),
-                c.getFieldKey(),
-                c.getLabel(),
-                c.getComponentType(),
-                c.getPlaceholder(),
-                c.getDefaultValue(),
-                "Y".equals(c.getIsRequired()),
-                "Y".equals(c.getIsReadonly()),
-                "Y".equals(c.getIsVisible()),
-                "Y".equals(c.getIsSortable()),
-                "Y".equals(c.getIsFilterable()),
-                "Y".equals(c.getIsGridColumn()),
-                c.getDisplayOrder(),
-                c.getGridColSpan(),
-                c.getValidationRegex(),
-                c.getValidationMsg(),
-                c.getOptionsSource(),
-                toOptionsList(c.getOptionsJson()),
-                c.getVisibilityRule(),
-                c.getFormatPattern()
+                c.getComponentId(), c.getFieldKey(), c.getLabel(), c.getComponentType(),
+                c.getPlaceholder(), c.getDefaultValue(),
+                Boolean.TRUE.equals(c.getIsRequired()), Boolean.TRUE.equals(c.getIsReadonly()),
+                Boolean.TRUE.equals(c.getIsVisible()), Boolean.TRUE.equals(c.getIsSortable()),
+                Boolean.TRUE.equals(c.getIsFilterable()), Boolean.TRUE.equals(c.getIsGridColumn()),
+                Boolean.TRUE.equals(c.getFireOnChange()),
+                c.getVisibilityExp(), c.getReadonlyExp(), c.getRequireExp(),
+                c.getLabelExp(), c.getOnFireOnChangeExp(), c.getDynamicListDataExp(),
+                c.getDisplayOrder(), c.getGridColSpan(), c.getColSpan(), c.getRowSpan(),
+                c.getValidationRegex(), c.getValidationMsg(),
+                c.getMaxLength(), c.getMinValue(), c.getMaxValue(),
+                c.getOptionsSource(), toOptionsList(c.getOptionsJson()),
+                c.getRelatedEntity(), c.getDisplayField(),
+                c.getFormatPattern(), c.getDateOnly(), c.getCaseTransform(), c.getNbLines()
+        );
+    }
+
+    private ActionDto toActionDto(UiAction a) {
+        return new ActionDto(
+                a.getActionId(),
+                a.getCode(),
+                a.getLabel(),
+                a.getIcon(),
+                a.getActionType() != null ? a.getActionType().name() : null,
+                a.getRenderer(),
+                a.getHttpMethod(),
+                a.getEndpoint(),
+                Boolean.TRUE.equals(a.getIsEnabled()),
+                Boolean.TRUE.equals(a.getRequireValidation()),
+                Boolean.TRUE.equals(a.getRequireSelection()),
+                Boolean.TRUE.equals(a.getWithConfirmation()),
+                a.getConfirmationMsg(),
+                Boolean.TRUE.equals(a.getEndAction()),
+                a.getConditionExp(),
+                a.getColor(),
+                a.getDisplayOrder(),
+                a.getGroupCode(),
+                Boolean.TRUE.equals(a.getKbCtrl()),
+                Boolean.TRUE.equals(a.getKbAlt()),
+                Boolean.TRUE.equals(a.getKbShift()),
+                a.getKbKey()
+        );
+    }
+
+    private ColumnDto toColumnDto(UiColumn col) {
+        return new ColumnDto(
+                col.getColumnId(),
+                col.getFieldName(),
+                col.getLabel(),
+                col.getWidth(),
+                col.getColumnAlign(),
+                Boolean.TRUE.equals(col.getIsSortable()),
+                Boolean.TRUE.equals(col.getIsFilterable()),
+                Boolean.TRUE.equals(col.getIsEditable()),
+                Boolean.TRUE.equals(col.getIsVisible()),
+                col.getVisibilityExp(),
+                col.getLabelExp(),
+                col.getFormatPattern(),
+                col.getActionCode(),
+                col.getDisplayOrder()
         );
     }
 
@@ -223,7 +311,7 @@ public class MetadataService {
         if (shortcutRepo.findByUserIdAndScreenCode(userId, screenCode).isPresent()) return;
 
         // Vérifier que l'écran existe
-        screenRepo.findByCodeAndIsActive(screenCode, "Y")
+        screenRepo.findByCodeAndIsActive(screenCode, true)
                 .orElseThrow(() -> new ScreenNotFoundException(screenCode));
 
         long count = shortcutRepo.countByUserId(userId);
@@ -238,8 +326,7 @@ public class MetadataService {
     }
 
     private String extractIcon(UiScreen screen) {
-        if (screen == null || screen.getGridConfig() == null) return "squares-2x2";
-        Object icon = screen.getGridConfig().get("icon");
-        return icon instanceof String s ? s : "squares-2x2";
+        if (screen == null) return "squares-2x2";
+        return "squares-2x2";
     }
 }

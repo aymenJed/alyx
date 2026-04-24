@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
-    Optional<AppUser> findByUsernameAndIsActive(String username, String isActive);
+    Optional<AppUser> findByUsernameAndIsActive(String username, Boolean isActive);
     Optional<AppUser> findByUsername(String username);
     boolean existsByUsername(String username);
 
-    List<AppUser> findByIsActive(String isActive);
+    List<AppUser> findByIsActive(Boolean isActive);
 
     Page<AppUser> findAll(Pageable pageable);
 

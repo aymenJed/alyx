@@ -1,6 +1,9 @@
 package com.alyx.security.repository;
 
 import com.alyx.security.entity.UserRoleAssignment;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,13 +16,23 @@ import java.util.Optional;
 @Repository
 public interface UserRoleAssignmentRepository extends JpaRepository<UserRoleAssignment, Long> {
 
-    List<UserRoleAssignment> findByUserId(Long userId);
+    Page<UserRoleAssignment> findAll(Pageable pageable);
 
-    List<UserRoleAssignment> findByRoleId(Long roleId);
+    @Query("SELECT ura FROM UserRoleAssignment ura WHERE " +
+           "LOWER(ura.user.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(ura.role.roleName) LIKE LOWER(CONCAT('%', :search, '%'))")
+    Page<UserRoleAssignment> search(@Param("search") String search, Pageable pageable);
 
-    Optional<UserRoleAssignment> findByUserIdAndRoleId(Long userId, Long roleId);
+    @Query("SELECT ura FROM UserRoleAssignment ura WHERE ura.user.id = :userId")
+    List<UserRoleAssignment> findByUserId(@Param("userId") Long userId);
 
-    boolean existsByUserIdAndRoleId(Long userId, Long roleId);
+    @Query("SELECT ura FROM UserRoleAssignment ura WHERE ura.role.id = :roleId")
+    List<UserRoleAssignment> findByRoleId(@Param("roleId") Long roleId);
+
+    @Query("SELECT ura FROM UserRoleAssignment ura WHERE ura.user.id = :userId AND ura.role.id = :roleId")
+    Optional<UserRoleAssignment> findByUserIdAndRoleId(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    boolean existsByUser_IdAndRole_Id(Long userId, Long roleId);
 
     @Modifying
     @Query("DELETE FROM UserRoleAssignment ura WHERE ura.user.id = :userId AND ura.role.id = :roleId")

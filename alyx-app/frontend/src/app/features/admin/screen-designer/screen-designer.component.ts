@@ -7,12 +7,22 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { JsonPipe } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import {
   ScreenMetadata, ComponentMetadata, TemplateType
 } from '../../../core/models/screen-metadata.model';
+
+/** Type local pour les actions de grille (designer uniquement) */
+interface GridAction {
+  key: string;
+  label: string;
+  icon: string;
+  color?: string;
+  confirmRequired?: boolean;
+}
 import { ComponentEditorComponent } from './component-editor/component-editor.component';
 
-type Tab = 'general' | 'fields' | 'preview';
+type Tab = 'general' | 'fields' | 'actions' | 'preview';
 type DesignerMode = 'list' | 'create' | 'edit';
 
 @Component({
@@ -438,6 +448,148 @@ FROM ui_screen WHERE code = '{{ selectedScreen()?.code }}';</code>
               </div>
             }
 
+            <!-- ─── ONGLET BOUTONS (actions de grille) ──────── -->
+            @if (activeTab() === 'actions') {
+              <div class="max-w-4xl space-y-4">
+
+                <div class="flex items-center justify-between">
+                  <p class="text-xs text-slate-500">
+                    <span class="font-semibold text-slate-700">{{ gridActions().length }}</span> bouton(s) d'action par ligne
+                    @if (selectedScreen()?.templateType !== 'GRID' && selectedScreen()?.templateType !== 'MASTER_DETAIL') {
+                      — <span class="text-amber-600">disponible uniquement pour les templates GRID et MASTER_DETAIL</span>
+                    }
+                  </p>
+                  <button class="btn-primary text-xs flex items-center gap-1.5"
+                          (click)="addAction()">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Ajouter un bouton
+                  </button>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <table class="w-full text-xs">
+                    <thead>
+                      <tr class="bg-slate-50 border-b border-slate-200 text-left">
+                        <th class="px-3 py-2.5 w-8"></th>
+                        <th class="px-3 py-2.5 font-semibold text-slate-600">Clé</th>
+                        <th class="px-3 py-2.5 font-semibold text-slate-600">Libellé</th>
+                        <th class="px-3 py-2.5 font-semibold text-slate-600">Icône</th>
+                        <th class="px-3 py-2.5 font-semibold text-slate-600">Couleur</th>
+                        <th class="px-3 py-2.5 font-semibold text-slate-600 text-center">Confirmation</th>
+                        <th class="px-3 py-2.5 font-semibold text-slate-600 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      @if (gridActions().length === 0) {
+                        <tr>
+                          <td colspan="7" class="px-4 py-10 text-center text-slate-400">
+                            Aucun bouton — cliquez sur "Ajouter un bouton" pour commencer
+                          </td>
+                        </tr>
+                      } @else {
+                        @for (act of gridActions(); track act; let i = $index) {
+                          <tr class="hover:bg-slate-50 transition-colors group">
+                            <td class="px-3 py-2.5 text-slate-300">⠿</td>
+                            <td class="px-3 py-2.5">
+                              <input type="text" [value]="act.key"
+                                     (input)="updateAction(i, 'key', $any($event.target).value)"
+                                     class="w-28 px-2 py-1 text-xs border border-slate-200 rounded font-mono" />
+                            </td>
+                            <td class="px-3 py-2.5">
+                              <input type="text" [value]="act.label"
+                                     (input)="updateAction(i, 'label', $any($event.target).value)"
+                                     class="w-36 px-2 py-1 text-xs border border-slate-200 rounded" />
+                            </td>
+                            <td class="px-3 py-2.5">
+                              <select [value]="act.icon"
+                                      (change)="updateAction(i, 'icon', $any($event.target).value)"
+                                      class="px-2 py-1 text-xs border border-slate-200 rounded">
+                                @for (ic of iconPresets; track ic) {
+                                  <option [value]="ic">{{ ic }}</option>
+                                }
+                              </select>
+                            </td>
+                            <td class="px-3 py-2.5">
+                              <div class="flex gap-1">
+                                @for (col of actionColors; track col) {
+                                  <button type="button"
+                                          class="w-5 h-5 rounded-full border-2 transition-all"
+                                          [class.border-slate-900]="(act.color ?? 'blue') === col"
+                                          [class.border-transparent]="(act.color ?? 'blue') !== col"
+                                          [class]="colorSwatchClass(col)"
+                                          (click)="updateAction(i, 'color', col)"
+                                          [title]="col"></button>
+                                }
+                              </div>
+                            </td>
+                            <td class="px-3 py-2.5 text-center">
+                              <input type="checkbox" [checked]="act.confirmRequired ?? false"
+                                     (change)="updateAction(i, 'confirmRequired', $any($event.target).checked)"
+                                     class="h-4 w-4 rounded" />
+                            </td>
+                            <td class="px-3 py-2.5">
+                              <div class="flex justify-end gap-1">
+                                <button class="p-1 text-slate-400 hover:text-slate-700 rounded"
+                                        [disabled]="i === 0"
+                                        (click)="moveAction(i, -1)" title="Monter">↑</button>
+                                <button class="p-1 text-slate-400 hover:text-slate-700 rounded"
+                                        [disabled]="i === gridActions().length - 1"
+                                        (click)="moveAction(i, 1)" title="Descendre">↓</button>
+                                <button class="p-1 text-red-400 hover:text-red-700 hover:bg-red-50 rounded"
+                                        (click)="removeAction(i)" title="Supprimer">
+                                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        }
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Colonnes de grille (aperçu synthétique) -->
+                <div class="bg-white rounded-xl border border-slate-200 p-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <p class="text-xs font-semibold text-slate-700">Colonnes affichées dans la grille</p>
+                      <p class="text-[10px] text-slate-400 mt-0.5">Activez/désactivez les champs visibles comme colonnes</p>
+                    </div>
+                    <span class="text-[10px] text-slate-500">
+                      {{ gridColumnCount() }} / {{ components().length }} actives
+                    </span>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    @for (comp of components(); track comp.componentId) {
+                      <button type="button"
+                              class="px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all"
+                              [class]="comp.gridColumn
+                                ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'
+                                : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'"
+                              (click)="toggleGridColumn(comp)">
+                        {{ comp.gridColumn ? '✓' : '○' }} {{ comp.label }}
+                      </button>
+                    }
+                    @if (components().length === 0) {
+                      <p class="text-[11px] text-slate-400">Aucun champ — ajoutez-en depuis l'onglet Champs</p>
+                    }
+                  </div>
+                </div>
+
+                <div class="flex justify-end">
+                  <button class="btn-primary text-xs" (click)="persistGridActions()"
+                          [disabled]="isSaving()">
+                    {{ isSaving() ? 'Enregistrement...' : 'Enregistrer les boutons' }}
+                  </button>
+                </div>
+              </div>
+            }
+
             <!-- ─── ONGLET APERÇU JSON ──────────────────────── -->
             @if (activeTab() === 'preview') {
               <div class="max-w-3xl space-y-4">
@@ -491,6 +643,7 @@ export class ScreenDesignerComponent implements OnInit {
   private readonly http      = inject(HttpClient);
   private readonly fb        = inject(FormBuilder);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly route     = inject(ActivatedRoute);
 
   private readonly BASE = '/api/v1/designer';
 
@@ -525,7 +678,18 @@ export class ScreenDesignerComponent implements OnInit {
   readonly tabs: { key: Tab; label: string }[] = [
     { key: 'general', label: 'Général' },
     { key: 'fields',  label: 'Champs' },
+    { key: 'actions', label: 'Boutons' },
     { key: 'preview', label: 'Aperçu JSON' },
+  ];
+
+  readonly gridActions = signal<GridAction[]>([]);
+
+  readonly actionColors: Array<'blue' | 'amber' | 'red' | 'green' | 'gray'> =
+    ['blue', 'amber', 'red', 'green', 'gray'];
+
+  readonly iconPresets: string[] = [
+    'pencil', 'eye', 'trash', 'plus', 'check', 'x',
+    'download', 'upload', 'refresh', 'play', 'pause', 'lock',
   ];
 
   // ─── Formulaire écran ──────────────────────────────────────
@@ -608,9 +772,20 @@ export class ScreenDesignerComponent implements OnInit {
   loadScreens(): void {
     this.isLoadingList.set(true);
     this.http.get<ScreenMetadata[]>(`${this.BASE}/screens`).subscribe({
-      next: list => { this.screens.set(list); this.isLoadingList.set(false); },
+      next: list => {
+        this.screens.set(list);
+        this.isLoadingList.set(false);
+        this.autoSelectFromQueryParam();
+      },
       error: ()  => this.isLoadingList.set(false),
     });
+  }
+
+  private autoSelectFromQueryParam(): void {
+    const code = this.route.snapshot.queryParamMap.get('screenCode');
+    if (!code) return;
+    const match = this.screens().find(s => s.code === code);
+    if (match) this.selectScreen(match);
   }
 
   selectScreen(screen: ScreenMetadata): void {
@@ -628,6 +803,7 @@ export class ScreenDesignerComponent implements OnInit {
     this.screenForm.reset();
     this.screenForm.get('code')?.enable();
     this.components.set([]);
+    this.gridActions.set([]);
   }
 
   saveScreen(): void {
@@ -765,6 +941,80 @@ export class ScreenDesignerComponent implements OnInit {
     navigator.clipboard.writeText(this.previewJson());
   }
 
+  // ─── Actions (boutons de grille) ───────────────────────────
+
+  gridColumnCount(): number {
+    return this.components().filter(c => c.gridColumn).length;
+  }
+
+  colorSwatchClass(color: string): string {
+    return {
+      blue:  'bg-blue-500',
+      amber: 'bg-amber-500',
+      red:   'bg-red-500',
+      green: 'bg-green-500',
+      gray:  'bg-slate-400',
+    }[color] ?? 'bg-slate-400';
+  }
+
+  addAction(): void {
+    const n = this.gridActions().length + 1;
+    this.gridActions.update(list => [...list, {
+      key: `action_${n}`,
+      label: `Action ${n}`,
+      icon: 'pencil',
+      color: 'blue',
+      confirmRequired: false,
+    }]);
+  }
+
+  updateAction(index: number, field: keyof GridAction, value: unknown): void {
+    this.gridActions.update(list => {
+      const copy = [...list];
+      copy[index] = { ...copy[index], [field]: value } as GridAction;
+      return copy;
+    });
+  }
+
+  removeAction(index: number): void {
+    this.gridActions.update(list => list.filter((_, i) => i !== index));
+  }
+
+  moveAction(index: number, direction: -1 | 1): void {
+    const list = [...this.gridActions()];
+    const swap = index + direction;
+    if (swap < 0 || swap >= list.length) return;
+    [list[index], list[swap]] = [list[swap], list[index]];
+    this.gridActions.set(list);
+  }
+
+  /** Synchronise gridActions vers le champ gridConfigRaw puis enregistre l'écran. */
+  persistGridActions(): void {
+    const raw = (this.screenForm.get('gridConfigRaw')?.value ?? '').trim();
+    let cfg: Record<string, unknown> = {};
+    if (raw) {
+      try { cfg = JSON.parse(raw); } catch { cfg = {}; }
+    }
+    cfg['actions'] = this.gridActions();
+    this.screenForm.patchValue({ gridConfigRaw: JSON.stringify(cfg, null, 2) });
+    this.saveScreen();
+  }
+
+  /** Toggle la colonne de grille d'un composant et persiste via PUT. */
+  toggleGridColumn(comp: ComponentMetadata): void {
+    const screenId = this.selectedScreen()?.screenId;
+    if (!screenId || !comp.componentId) return;
+    const updated: ComponentMetadata = { ...comp, gridColumn: !comp.gridColumn };
+    this.http.put<ComponentMetadata>(
+      `${this.BASE}/screens/${screenId}/components/${comp.componentId}`,
+      updated
+    ).subscribe(saved => {
+      this.components.update(list =>
+        list.map(c => c.componentId === saved.componentId ? saved : c)
+      );
+    });
+  }
+
   // ─── Helpers ───────────────────────────────────────────────
 
   private patchForm(screen: ScreenMetadata): void {
@@ -774,12 +1024,13 @@ export class ScreenDesignerComponent implements OnInit {
       description:         screen.description ?? '',
       templateType:        screen.templateType,
       apiBaseUrl:          screen.apiBaseUrl,
-      permissionsRaw:      screen.permissions ? JSON.stringify(screen.permissions, null, 2) : '',
-      gridConfigRaw:       screen.gridConfig  ? JSON.stringify(screen.gridConfig,  null, 2) : '',
+      permissionsRaw:      '',
+      gridConfigRaw:       '',
       analyticsConfigRaw:  screen.analyticsConfig ? JSON.stringify(screen.analyticsConfig, null, 2) : '',
-      customComponentName: screen.customComponentName ?? '',
+      customComponentName: '',
     });
     this.screenForm.get('code')?.disable();
+    this.gridActions.set([]);
   }
 
   private parseJson(

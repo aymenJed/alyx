@@ -24,7 +24,7 @@ public interface AppMenuRepository extends JpaRepository<AppMenu, Long> {
     @Query("""
         SELECT m FROM AppMenu m
         WHERE m.parent IS NULL
-          AND m.isActive = 'Y'
+          AND m.isActive = true
         ORDER BY m.displayOrder ASC
         """)
     List<AppMenu> findRootMenusActive();
@@ -35,7 +35,7 @@ public interface AppMenuRepository extends JpaRepository<AppMenu, Long> {
     @Query("""
         SELECT m FROM AppMenu m
         WHERE m.parent.id = :parentId
-          AND m.isActive = 'Y'
+          AND m.isActive = true
         ORDER BY m.displayOrder ASC
         """)
     List<AppMenu> findActiveChildrenByParentId(@Param("parentId") Long parentId);

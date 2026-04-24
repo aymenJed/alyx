@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * DTO Record Java 22 — Configuration atomique d'un champ/colonne.
- * Transporté vers le Frontend pour construire dynamiquement
- * les formulaires et tableaux (FormGenerator / DataGrid).
+ * DTO d'un champ/composant d'écran.
+ * Aligné sur la hiérarchie FieldView / SimpleField du modèle de référence PresentationViewModel.
+ * visibilityRule (JSON vague) remplacé par visibilityExp (expression évaluable côté client).
  */
 public record ComponentDto(
-        Long componentId,
+        Long   componentId,
         String fieldKey,
         String label,
         String componentType,
@@ -21,12 +21,33 @@ public record ComponentDto(
         boolean sortable,
         boolean filterable,
         boolean gridColumn,
-        int displayOrder,
-        int gridColSpan,
-        String validationRegex,
-        String validationMsg,
-        String optionsSource,
+        boolean fireOnChange,
+        // Expressions dynamiques (*Exp — modèle de référence)
+        String visibilityExp,
+        String readonlyExp,
+        String requireExp,
+        String labelExp,
+        String onFireOnChangeExp,
+        String dynamicListDataExp,
+        // Layout
+        int    displayOrder,
+        int    gridColSpan,
+        Integer colSpan,
+        Integer rowSpan,
+        // Validation
+        String  validationRegex,
+        String  validationMsg,
+        Integer maxLength,
+        Double  minValue,
+        Double  maxValue,
+        // Options / Relations
+        String              optionsSource,
         List<Map<String, Object>> options,
-        Map<String, Object> visibilityRule,
-        String formatPattern
+        String              relatedEntity,
+        String              displayField,
+        // Rendu
+        String  formatPattern,
+        Boolean dateOnly,
+        String  caseTransform,
+        Integer nbLines
 ) {}

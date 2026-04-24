@@ -193,7 +193,7 @@ export class MasterDetailComponent implements OnInit {
     this.isLoading.set(true);
     const params = new HttpParams()
       .set('page', this.currentPage())
-      .set('size', this.metadata.gridConfig?.pageSize ?? 15)
+      .set('size', this.metadata.pageSize ?? 15)
       .set('search', this.searchTerm);
 
     this.http

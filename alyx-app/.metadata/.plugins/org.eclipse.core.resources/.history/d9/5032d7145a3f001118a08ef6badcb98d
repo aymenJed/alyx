@@ -1,0 +1,77 @@
+package com.alyx.security.service;
+
+import com.alyx.security.entity.Role;
+import com.alyx.security.dto.RoleDto;
+import com.alyx.security.dto.CreateRoleRequest;
+import com.alyx.security.dto.UpdateRoleRequest;
+import com.alyx.security.repository.RoleRepository;
+import com.alyx.security.repository.UserRoleAssignmentRepository;
+import com.alyx.core.common.PagedResponse;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class UserRoleAssignmentService {
+
+    private final UserRoleAssignmentRepository userRoleAssignmentRepo;
+
+    public UserRoleAssignmentService(RoleRepository roleRepo) {
+        this.userRoleAssignmentRepo = roleRepo;
+    }
+
+    // ── READ ─────────────────────────────────────────────────────
+
+    @Transactional(readOnly = true)
+    public PagedResponse<RoleDto> findAll(int page, int size, String search) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("roleName").ascending());
+        var p = (search == null || search.isBlank())
+            ? userRoleAssignmentRepo.findAll(pageable)
+            : userRoleAssignmentRepo.search(search, pageable);
+        return PagedResponse.of(p.map(UserRoleAssignmentRepo::from));
+    }
+
+    @Transactional(readOnly = true)
+    public RoleDto findById(Long id) {
+        return userRoleAssignmentRepo.findById(id)
+            .map(RoleDto::from)
+            .orElseThrow(() -> new RuntimeException("Role introuvable : " + id));
+    }
+
+    // ── CREATE ───────────────────────────────────────────────────
+
+    public RoleDto create(CreateRoleRequest req) {
+        Role role = new Role();
+        role.setRoleName(req.roleName());
+        role.setRoleDescription(req.roleDescription());
+        role.setRoleType(req.roleType());
+        role.setIsActive(req.isActive());
+
+        return RoleDto.from(userRoleAssignmentRepo.save(role));
+    }
+
+    // ── UPDATE ───────────────────────────────────────────────────
+
+    public RoleDto update(Long id, UpdateRoleRequest req) {
+        Role role = userRoleAssignmentRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Role introuvable : " + id));
+        role.setRoleName(req.roleName());
+        role.setRoleDescription(req.roleDescription());
+        role.setRoleType(req.roleType());
+        role.setIsActive(req.isActive());
+
+        return RoleDto.from(userRoleAssignmentRepo.save(role));
+    }
+
+    // ── DELETE ───────────────────────────────────────────────────
+
+    public void delete(Long id) {
+        if (!userRoleAssignmentRepo.existsById(id)) {
+            throw new RuntimeException("Role introuvable : " + id);
+        }
+        userRoleAssignmentRepo.deleteById(id);
+    }
+}

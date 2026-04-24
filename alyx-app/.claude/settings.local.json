@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn clean *)",
+      "Bash(mvn compile *)",
+      "Bash(mvn spring-boot:run -q)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist //FI \"PID eq 22288\")",
+      "Bash(taskkill //PID 22288 //F)",
+      "Bash(npm start *)",
+      "Read(//c/Users/AYMEN/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/3795f7a0-e812-42eb-b0fb-c1f21cc873f3/27f9079e-3db1-4330-be14-7a485e5d2db4/skills/docx/**)",
+      "Bash(pandoc \"C:\\\\Users\\\\AYMEN\\\\Desktop\\\\PresentationViewModel.docx\" -o output.md --track-changes=all)",
+      "Bash(python /c/Users/AYMEN/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/3795f7a0-e812-42eb-b0fb-c1f21cc873f3/27f9079e-3db1-4330-be14-7a485e5d2db4/skills/docx/scripts/office/unpack.py /c/Users/AYMEN/Desktop/PresentationViewModel.docx /c/Users/AYMEN/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/3795f7a0-e812-42eb-b0fb-c1f21cc873f3/27f9079e-3db1-4330-be14-7a485e5d2db4/skills/docx/unpacked/)",
+      "Bash(py --version)",
+      "Bash(python3.exe --version)",
+      "Bash(mkdir -p /tmp/docx_unpack)",
+      "Bash(cp \"/c/Users/AYMEN/Desktop/PresentationViewModel.docx\" /tmp/docx_unpack/doc.zip)",
+      "Read(//tmp/**)",
+      "Bash(unzip -o doc.zip -d extracted/)",
+      "Bash(echo \"Backend PID: $!\")",
+      "Bash(npx ng *)",
+      "Bash(xargs grep *)",
+      "Bash(python scripts/office/unpack.py \"C:\\\\Users\\\\AYMEN\\\\Desktop\\\\Administration de la sécurité.docx\" unpacked_admin/)",
+      "Bash(pandoc \"C:\\\\Users\\\\AYMEN\\\\Desktop\\\\Administration de la sécurité.docx\" -t markdown)",
+      "Bash(cp \"C:\\\\Users\\\\AYMEN\\\\Desktop\\\\Administration de la sécurité.docx\" ./admin_sec.docx)",
+      "Bash(unzip -o admin_sec.docx -d admin_sec_unpacked/)",
+      "Bash(cp /tmp/admin_sec_unpacked/word/media/image1.png \"E:/MY PROJ/GitHub/alyx/alyx-app/image1.png\")",
+      "Bash(cp /tmp/admin_sec_unpacked/word/media/image2.png \"E:/MY PROJ/GitHub/alyx/alyx-app/image2.png\")",
+      "Bash(cp /tmp/admin_sec_unpacked/word/media/image3.png \"E:/MY PROJ/GitHub/alyx/alyx-app/image3.png\")",
+      "Bash(cp /tmp/admin_sec_unpacked/word/media/image4.png \"E:/MY PROJ/GitHub/alyx/alyx-app/image4.png\")",
+      "Bash(cp /tmp/admin_sec_unpacked/word/media/image5.png \"E:/MY PROJ/GitHub/alyx/alyx-app/image5.png\")",
+      "Bash(git -C \"E:/MY PROJ/GitHub/alyx/alyx-app\" status)",
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(./gradlew bootRun)",
+      "Bash(echo \"Backend started in background with PID $!\")",
+      "Bash(taskkill //F //PID 14260)",
+      "Bash(taskkill //F //PID 13200)"
+    ]
+  }
+}

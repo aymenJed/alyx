@@ -8,6 +8,6 @@ public record UpdateMenuRequest(
     String route,
     String screenCode,
     Integer displayOrder,
-    String isActive,
+    Boolean isActive,
     String roleRequired
 ) {}

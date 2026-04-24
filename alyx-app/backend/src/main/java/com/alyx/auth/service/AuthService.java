@@ -39,7 +39,7 @@ public class AuthService {
 
         // 2. Load full user for extra claims
         UserDetails details = userDetailsService.loadUserByUsername(request.username());
-        AppUser user = userRepository.findByUsernameAndIsActive(request.username(), "Y")
+        AppUser user = userRepository.findByUsernameAndIsActive(request.username(), true)
                 .orElseThrow();
 
         // 3. Build token with roles claim

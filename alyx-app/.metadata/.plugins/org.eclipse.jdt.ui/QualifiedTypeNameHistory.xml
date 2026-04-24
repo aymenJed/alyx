@@ -1,2 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="com.alyx.security.entity.UserRoleAssignment"/>
+    <fullyQualifiedTypeName name="com.alyx.security.entity.Role"/>
+    <fullyQualifiedTypeName name="java.lang.Boolean"/>
+    <fullyQualifiedTypeName name="com.alyx.metadata.entity.TemplateType"/>
+    <fullyQualifiedTypeName name="com.alyx.security.repository.UserRoleAssignmentRepository"/>
+    <fullyQualifiedTypeName name="com.alyx.metadata.entity.ActionType"/>
+</qualifiedTypeNameHistroy>

@@ -23,8 +23,8 @@ public class Role extends BaseEntity {
     @Column(name = "ROLE_TYPE", nullable = false, length = 20)
     private String roleType = "CUSTOM";
 
-    @Column(name = "IS_ACTIVE", nullable = false, columnDefinition = "char(1)")
-    private String isActive = "Y";
+    @Column(name = "IS_ACTIVE", nullable = false)
+    private Boolean isActive =true;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoleScreenAccess> screenAccesses = new ArrayList<>();
@@ -39,8 +39,8 @@ public class Role extends BaseEntity {
     public void setRoleDescription(String d)    { this.roleDescription = d; }
     public String getRoleType()                  { return roleType; }
     public void setRoleType(String t)           { this.roleType = t; }
-    public String getIsActive()                  { return isActive; }
-    public void setIsActive(String a)           { this.isActive = a; }
+    public Boolean getIsActive()                  { return isActive; }
+    public void setIsActive(Boolean a)           { this.isActive = a; }
     public List<RoleScreenAccess> getScreenAccesses() { return screenAccesses; }
     public void setScreenAccesses(List<RoleScreenAccess> s) { this.screenAccesses = s; }
     public List<UserRoleAssignment> getUserAssignments() { return userAssignments; }

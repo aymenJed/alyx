@@ -30,8 +30,8 @@ public class AppUser extends BaseEntity {
     @Column(name = "roles", nullable = false, length = 200)
     private String roles;
 
-    @Column(name = "is_active", nullable = false, columnDefinition = "char(1)")
-    private String isActive = "Y";
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 
     // -------------------------------------------------------
     // Helpers
@@ -45,7 +45,7 @@ public class AppUser extends BaseEntity {
     }
 
     public boolean isEnabled() {
-        return "Y".equals(isActive);
+        return Boolean.TRUE.equals(isActive);
     }
 
     // -------------------------------------------------------
@@ -63,6 +63,6 @@ public class AppUser extends BaseEntity {
     public void setEmail(String email)         { this.email = email; }
     public String getRoles()                   { return roles; }
     public void setRoles(String roles)         { this.roles = roles; }
-    public String getIsActive()                { return isActive; }
-    public void setIsActive(String isActive)   { this.isActive = isActive; }
+    public Boolean getIsActive()               { return isActive; }
+    public void setIsActive(Boolean isActive)  { this.isActive = isActive; }
 }

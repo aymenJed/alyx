@@ -31,6 +31,28 @@
 }
 
 @layer components {
+  /* ── Boutons CARTHAGO (ERP style) ── */
+  .crt-btn {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium
+           text-gray-700 bg-white border border-gray-300
+           hover:bg-gray-50 active:bg-gray-100
+           disabled:opacity-40 disabled:cursor-not-allowed transition-colors;
+  }
+  .crt-btn-primary {
+    @apply bg-[#2a7fc9] text-white border-[#2a7fc9] hover:bg-[#1e6faf];
+  }
+  .crt-btn-danger {
+    @apply text-red-600 border-red-300 hover:bg-red-50;
+  }
+  .crt-btn-active {
+    @apply bg-[#dde8f0] border-[#2a7fc9];
+  }
+  .crt-pag-btn {
+    @apply inline-flex items-center justify-center px-1.5 py-0.5 text-xs
+           text-gray-600 border border-gray-300 bg-white
+           hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors;
+  }
+
   /* Boutons réutilisables */
   .btn-primary {
     @apply px-4 py-2 text-sm font-medium text-white bg-blue-600

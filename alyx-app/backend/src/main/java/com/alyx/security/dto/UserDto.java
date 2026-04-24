@@ -11,7 +11,7 @@ public record UserDto(
     String        email,
     String        roles,
     List<String>  roleList,
-    String        isActive,
+    Boolean       isActive,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     String        createdBy

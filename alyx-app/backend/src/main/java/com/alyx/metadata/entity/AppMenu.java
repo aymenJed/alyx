@@ -40,8 +40,8 @@ public class AppMenu extends BaseEntity {
     @Column(name = "DISPLAY_ORDER", nullable = false)
     private Integer displayOrder = 0;
 
-    @Column(name = "IS_ACTIVE", nullable = false, columnDefinition = "char(1)")
-    private String isActive = "Y";
+    @Column(name = "IS_ACTIVE", nullable = false)
+    private Boolean isActive = true;
 
     @Column(name = "ROLE_REQUIRED", length = 500)
     private String roleRequired;
@@ -57,7 +57,7 @@ public class AppMenu extends BaseEntity {
     public String getRoute()         { return route; }
     public String getScreenCode()    { return screenCode; }
     public Integer getDisplayOrder() { return displayOrder; }
-    public String getIsActive()      { return isActive; }
+    public Boolean getIsActive()     { return isActive; }
     public String getRoleRequired()  { return roleRequired; }
 
     // --- Setters ---
@@ -69,6 +69,6 @@ public class AppMenu extends BaseEntity {
     public void setRoute(String route)         { this.route = route; }
     public void setScreenCode(String screenCode) { this.screenCode = screenCode; }
     public void setDisplayOrder(Integer displayOrder) { this.displayOrder = displayOrder; }
-    public void setIsActive(String isActive)   { this.isActive = isActive; }
+    public void setIsActive(Boolean isActive)  { this.isActive = isActive; }
     public void setRoleRequired(String roleRequired) { this.roleRequired = roleRequired; }
 }

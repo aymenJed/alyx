@@ -78,17 +78,17 @@ public class MenuManagementService {
         List<AppMenu> menus = menuRepository.findAll();
 
         List<MenuOptionDto> availableParents = menus.stream()
-                .filter(m -> "Y".equals(m.getIsActive()))
+                .filter(m -> Boolean.TRUE.equals(m.getIsActive()))
                 .map(m -> new MenuOptionDto(m.getId(), m.getCode(), m.getLabel(), "menu"))
                 .toList();
 
         List<UiScreen> screens = screenRepository.findAll();
         List<MenuOptionDto> availableScreens = screens.stream()
-                .filter(s -> "Y".equals(s.getIsActive()))
+                .filter(s -> Boolean.TRUE.equals(s.getIsActive()))
                 .map(s -> new MenuOptionDto(s.getScreenId(), s.getCode(), s.getTitle(), "screen"))
                 .toList();
 
-        List<MenuOptionDto> availableRoles = roleRepository.findByIsActiveOrderByRoleNameAsc("Y").stream()
+        List<MenuOptionDto> availableRoles = roleRepository.findByIsActiveOrderByRoleNameAsc(true).stream()
                 .map(r -> new MenuOptionDto(r.getRoleId(), r.getRoleName(), r.getRoleDescription(), "role"))
                 .toList();
 
@@ -114,7 +114,7 @@ public class MenuManagementService {
         menu.setRoute(request.route());
         menu.setScreenCode(request.screenCode());
         menu.setDisplayOrder(request.displayOrder() != null ? request.displayOrder() : 0);
-        menu.setIsActive(request.isActive() != null ? request.isActive() : "Y");
+        menu.setIsActive(request.isActive() != null ? request.isActive() : true);
         menu.setRoleRequired(request.roleRequired());
         menu.setParent(parent);
 
@@ -166,7 +166,7 @@ public class MenuManagementService {
             throw new RuntimeException("Cannot delete menu with children. Delete or move children first.");
         }
 
-        menu.setIsActive("N");
+        menu.setIsActive(false);
         menuRepository.save(menu);
     }
 
@@ -174,7 +174,7 @@ public class MenuManagementService {
     public void toggleMenuStatus(Long id) {
         AppMenu menu = menuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu not found with id: " + id));
-        menu.setIsActive("Y".equals(menu.getIsActive()) ? "N" : "Y");
+        menu.setIsActive(!Boolean.TRUE.equals(menu.getIsActive()));
         menuRepository.save(menu);
     }
 

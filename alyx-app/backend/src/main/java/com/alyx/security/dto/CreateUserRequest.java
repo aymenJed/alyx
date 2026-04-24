@@ -10,5 +10,5 @@ public record CreateUserRequest(
     @NotBlank @Size(max = 100)          String fullName,
     @Email    @Size(max = 150)          String email,
     @NotBlank                           String roles,
-    String isActive
+    Boolean isActive
 ) {}

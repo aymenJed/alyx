@@ -2,8 +2,16 @@
 <section name="Workbench">
 	<section name="java.lang.Class">
 		<list key="findhistory">
+			<item value="Role"/>
+			<item value="role"/>
+			<item value="roles"/>
+			<item value="UserRoleAssignment"/>
 			<item value="/api/security/roles"/>
 			<item value="lombok"/>
+		</list>
+		<list key="replacehistory">
+			<item value="UserRoleAssignment"/>
+			<item value="UserRoleAssignments"/>
 		</list>
 	</section>
 </section>

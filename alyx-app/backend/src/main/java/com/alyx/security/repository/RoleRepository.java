@@ -15,21 +15,21 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     Page<Role> findAll(Pageable pageable);
 
-    @Query("SELECT r FROM Role r WHERE r.isActive = 'Y' AND " +
-    	       "(LOWER(r.roleName) LIKE LOWER(CONCAT('%', :search, '%')) OR " + 
-    	       "LOWER(r.roleDescription) LIKE LOWER(CONCAT('%', :search, '%')) OR " + 
+    @Query("SELECT r FROM Role r WHERE r.isActive = true AND " +
+    	       "(LOWER(r.roleName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+    	       "LOWER(r.roleDescription) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
     	       "LOWER(r.roleType) LIKE LOWER(CONCAT('%', :search, '%')))")
     	Page<Role> search(@Param("search") String search, Pageable pageable);
     
     
     Optional<Role> findByRoleName(String roleName);
 
-    List<Role> findByIsActiveOrderByRoleNameAsc(String isActive);
+    List<Role> findByIsActiveOrderByRoleNameAsc(Boolean isActive);
 
     @Query("SELECT r FROM Role r LEFT JOIN FETCH r.screenAccesses WHERE r.id = :id")
     Optional<Role> findByIdWithScreenAccesses(@Param("id") Long id);
 
-    @Query("SELECT DISTINCT r FROM Role r LEFT JOIN FETCH r.screenAccesses sa LEFT JOIN FETCH sa.screen WHERE r.isActive = 'Y'")
+    @Query("SELECT DISTINCT r FROM Role r LEFT JOIN FETCH r.screenAccesses sa LEFT JOIN FETCH sa.screen WHERE r.isActive = true")
     List<Role> findAllActiveWithScreenAccesses();
 
     boolean existsByRoleName(String roleName);

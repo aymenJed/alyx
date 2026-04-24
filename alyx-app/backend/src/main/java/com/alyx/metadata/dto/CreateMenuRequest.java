@@ -10,6 +10,6 @@ public record CreateMenuRequest(
     String route,
     String screenCode,
     Integer displayOrder,
-    String isActive,
+    Boolean isActive,
     String roleRequired
 ) {}

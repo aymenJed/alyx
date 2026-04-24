@@ -63,6 +63,29 @@ public class UserManagementController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/activate")
+    public ResponseEntity<Void> activate(@PathVariable Long id) {
+        service.setActive(id, true);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+        service.setActive(id, false);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/reset-password")
+    public ResponseEntity<Void> resetPassword(@PathVariable Long id) {
+        service.resetPassword(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<java.util.List<UserDto>> search(@RequestParam String q) {
+        return ResponseEntity.ok(service.searchAutocomplete(q));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

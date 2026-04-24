@@ -74,7 +74,7 @@ import { MenuNode } from '../../core/models/screen-metadata.model';
                 @if (isExpanded(node.code) && !menuService.isCollapsed()) {
                   <div class="ml-4 mt-1 space-y-1 border-l border-slate-700 pl-3">
                     @for (child of node.children; track child.id) {
-                      @if (child.isActive === 'Y') {
+                      @if (child.isActive === true) {
                         <a
                           [routerLink]="child.route"
                           routerLinkActive="bg-blue-600 text-white"
@@ -90,7 +90,7 @@ import { MenuNode } from '../../core/models/screen-metadata.model';
                     }
                   </div>
                 }
-              } @else if (node.isActive === 'Y') {
+              } @else if (node.isActive === true) {
                 <!-- Lien direct (sans enfants) -->
                 <a
                   [routerLink]="node.route"

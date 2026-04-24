@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface UiScreenRepository extends JpaRepository<UiScreen, Long> {
 
-    Optional<UiScreen> findByCodeAndIsActive(String code, String isActive);
+    Optional<UiScreen> findByCodeAndIsActive(String code, Boolean isActive);
 
     /**
      * Pour le ShortcutBar : retrouver plusieurs écrans par leurs codes.
@@ -19,7 +19,7 @@ public interface UiScreenRepository extends JpaRepository<UiScreen, Long> {
     @Query("""
         SELECT s FROM UiScreen s
         WHERE s.code IN :codes
-          AND s.isActive = 'Y'
+          AND s.isActive = true
         """)
     java.util.List<UiScreen> findAllByCodesActive(@Param("codes") java.util.Collection<String> codes);
 }

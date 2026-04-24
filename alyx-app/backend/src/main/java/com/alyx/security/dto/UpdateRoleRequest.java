@@ -10,5 +10,5 @@ public record UpdateRoleRequest(
     @NotBlank String roleName,
     String roleDescription,
     @NotBlank String roleType,
-    @NotBlank String isActive
+     Boolean isActive
 ) {}

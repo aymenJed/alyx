@@ -24,8 +24,8 @@ public class RoleScreenAccess extends BaseEntity {
     @Column(name = "ACCESS_LEVEL", nullable = false, length = 20)
     private String accessLevel = "READ";
 
-    @Column(name = "IS_ACTIVE", nullable = false, columnDefinition = "char(1)")
-    private String isActive = "Y";
+    @Column(name = "IS_ACTIVE", nullable = false)
+    private Boolean isActive = true;
 
     public RoleScreenAccess() {}
 
@@ -42,6 +42,6 @@ public class RoleScreenAccess extends BaseEntity {
     public void setScreen(com.alyx.metadata.entity.UiScreen s) { this.screen = s; }
     public String getAccessLevel()     { return accessLevel; }
     public void setAccessLevel(String a) { this.accessLevel = a; }
-    public String getIsActive()        { return isActive; }
-    public void setIsActive(String a) { this.isActive = a; }
+    public Boolean getIsActive()        { return isActive; }
+    public void setIsActive(Boolean a) { this.isActive = a; }
 }

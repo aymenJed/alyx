@@ -6,6 +6,7 @@ import { Subscription, filter } from 'rxjs';
 import { MetadataService }   from '../../../core/services/metadata.service';
 import { ShortcutService }   from '../../../core/services/shortcut.service';
 import { MenuService }       from '../../../core/services/menu.service';
+import { AuthService }       from '../../../core/services/auth.service';
 import { ScreenMetadata, MenuNode } from '../../../core/models/screen-metadata.model';
 import { FormGeneratorComponent }       from '../form-generator/form-generator.component';
 import { DataGridComponent }            from '../data-grid/data-grid.component';
@@ -32,36 +33,43 @@ import { AnalyticsDashboardComponent }  from '../analytics-dashboard/analytics-d
     AnalyticsDashboardComponent,
   ],
   template: `
-    <!-- En-tête commun à tous les écrans -->
+    <!-- ── Barre d'information (titre écran) ── -->
     @if (metadata()) {
-      <div class="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200">
-        <div>
-          <h1 class="text-lg font-semibold text-slate-800">{{ metadata()!.title }}</h1>
-          @if (metadata()!.description) {
-            <p class="text-xs text-slate-500 mt-0.5">{{ metadata()!.description }}</p>
-          }
-        </div>
-        <div class="flex items-center gap-2">
-          <!-- Bouton Favori -->
+      <div class="flex items-center gap-2 px-4 py-2 bg-[#2a7fc9] text-white shrink-0">
+        <!-- Icône info -->
+        <svg class="w-4 h-4 shrink-0 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        <span class="text-sm font-semibold tracking-wide">{{ metadata()!.title }}</span>
+        <div class="flex-1"></div>
+        <!-- Favori -->
+        <button
+          class="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+          (click)="shortcutService.toggleShortcut(metadata()!.code)"
+          [title]="shortcutService.isShortcut(metadata()!.code) ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        >
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+          </svg>
+        </button>
+        @if (authService.isAdmin()) {
           <button
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm border transition-all"
-            [class]="shortcutService.isShortcut(metadata()!.code)
-              ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
-              : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'"
-            (click)="shortcutService.toggleShortcut(metadata()!.code)"
-            [title]="shortcutService.isShortcut(metadata()!.code) ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+            class="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            (click)="openScreenDesigner()"
+            title="Configurer cet écran"
           >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
-            {{ shortcutService.isShortcut(metadata()!.code) ? 'Favori' : 'Ajouter' }}
+            Configurer écran
           </button>
-        </div>
+        }
       </div>
     }
 
     <!-- Zone de contenu -->
-    <div class="flex-1 overflow-auto bg-slate-50">
+    <div class="flex-1 overflow-auto bg-[#f0f0f0]">
       @if (isLoading()) {
         <!-- Skeleton -->
         <div class="p-6 space-y-4">
@@ -107,6 +115,7 @@ export class GenericRendererComponent implements OnInit, OnChanges, OnDestroy {
   @Input() screenCode?: string;
 
   readonly shortcutService = inject(ShortcutService);
+  readonly authService = inject(AuthService);
   private readonly metadataService = inject(MetadataService);
   private readonly menuService = inject(MenuService);
   private readonly route = inject(ActivatedRoute);
@@ -141,6 +150,17 @@ export class GenericRendererComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.navSub?.unsubscribe();
+  }
+
+  /**
+   * Ouvre le Screen Designer pré-chargé sur l'écran courant.
+   */
+  openScreenDesigner(): void {
+    const meta = this.metadata();
+    if (!meta) return;
+    this.router.navigate(['/admin/parametrage'], {
+      queryParams: { screenCode: meta.code }
+    });
   }
 
   /**

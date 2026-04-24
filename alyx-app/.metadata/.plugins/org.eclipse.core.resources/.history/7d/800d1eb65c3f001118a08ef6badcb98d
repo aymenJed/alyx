@@ -1,0 +1,143 @@
+package com.alyx.metadata.entity;
+
+import com.alyx.common.entity.BaseEntity;
+import jakarta.persistence.*;
+
+/**
+ * Action exécutable associée à un écran — équivalent de ActionElement / Action / ActionGroup
+ * du modèle de référence PresentationViewModel.
+ *
+ * actionType : MAIN (barre d'actions principale) | GRID (action de ligne) | SUBVIEW
+ * renderer   : BUTTON | LINK | IMAGE
+ */
+@Entity
+@Table(name = "UI_ACTION")
+@AttributeOverride(name = "id",        column = @Column(name = "ACTION_ID"))
+@AttributeOverride(name = "createdAt", column = @Column(name = "CREATED_AT", updatable = false, nullable = false))
+@AttributeOverride(name = "updatedAt", column = @Column(name = "UPDATED_AT", nullable = false))
+@AttributeOverride(name = "createdBy", column = @Column(name = "CREATED_BY", updatable = false, length = 50))
+@AttributeOverride(name = "updatedBy", column = @Column(name = "UPDATED_BY", length = 50))
+public class UiAction extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SCREEN_ID", nullable = false)
+    private UiScreen screen;
+
+    @Column(name = "CODE", nullable = false, length = 50)
+    private String code;
+
+    @Column(name = "LABEL", nullable = false, length = 200)
+    private String label;
+
+    @Column(name = "ICON", length = 100)
+    private String icon;
+
+    /** MAIN | GRID | SUBVIEW */
+    @Column(name = "ACTION_TYPE", nullable = false, length = 20)
+    private ActionType actionType = ActionType.MAIN;
+
+    /** BUTTON | LINK | IMAGE */
+    @Column(name = "RENDERER", length = 10)
+    private String renderer = "BUTTON";
+
+    /** Méthode HTTP déclenchée sur l'API (GET | POST | PUT | DELETE) */
+    @Column(name = "HTTP_METHOD", length = 10)
+    private String httpMethod;
+
+    /** URL de l'endpoint appelé (relative à apiBaseUrl) */
+    @Column(name = "ENDPOINT", length = 500)
+    private String endpoint;
+
+    @Column(name = "IS_ENABLED", length = 1, columnDefinition = "char(1)")
+    private String isEnabled = "Y";
+
+    @Column(name = "REQUIRE_VALIDATION", length = 1, columnDefinition = "char(1)")
+    private String requireValidation = "N";
+
+    /** L'action nécessite une sélection en grille avant d'être cliquable */
+    @Column(name = "REQUIRE_SELECTION", length = 1, columnDefinition = "char(1)")
+    private String requireSelection = "N";
+
+    /** Afficher une boite de confirmation avant exécution */
+    @Column(name = "WITH_CONFIRMATION", length = 1, columnDefinition = "char(1)")
+    private String withConfirmation = "N";
+
+    @Column(name = "CONFIRMATION_MSG", length = 500)
+    private String confirmationMsg;
+
+    /** Fermer la vue après exécution */
+    @Column(name = "END_ACTION", length = 1, columnDefinition = "char(1)")
+    private String endAction = "N";
+
+    /** Expression de condition d'activation (ex: "data.status === 'DRAFT'") */
+    @Column(name = "CONDITION_EXP", length = 500)
+    private String conditionExp;
+
+    /** Couleur CSS du bouton */
+    @Column(name = "COLOR", length = 30)
+    private String color;
+
+    @Column(name = "DISPLAY_ORDER", nullable = false)
+    private Integer displayOrder = 0;
+
+    /** Code de l'action groupe parent (ActionGroup) */
+    @Column(name = "GROUP_CODE", length = 50)
+    private String groupCode;
+
+    // Raccourci clavier (KeyboardShortcut)
+    @Column(name = "KB_CTRL",  length = 1, columnDefinition = "char(1)") private String kbCtrl  = "N";
+    @Column(name = "KB_ALT",   length = 1, columnDefinition = "char(1)") private String kbAlt   = "N";
+    @Column(name = "KB_SHIFT", length = 1, columnDefinition = "char(1)") private String kbShift = "N";
+    @Column(name = "KB_KEY",   length = 10)                              private String kbKey;
+
+    // ── Getters ───────────────────────────────────────────────────────────────
+
+    public Long getActionId()           { return getId(); }
+    public UiScreen getScreen()         { return screen; }
+    public String getCode()             { return code; }
+    public String getLabel()            { return label; }
+    public String getIcon()             { return icon; }
+    public ActionType getActionType()       { return actionType; }
+    public String getRenderer()         { return renderer; }
+    public String getHttpMethod()       { return httpMethod; }
+    public String getEndpoint()         { return endpoint; }
+    public String getIsEnabled()        { return isEnabled; }
+    public String getRequireValidation(){ return requireValidation; }
+    public String getRequireSelection() { return requireSelection; }
+    public String getWithConfirmation() { return withConfirmation; }
+    public String getConfirmationMsg()  { return confirmationMsg; }
+    public String getEndAction()        { return endAction; }
+    public String getConditionExp()     { return conditionExp; }
+    public String getColor()            { return color; }
+    public Integer getDisplayOrder()    { return displayOrder; }
+    public String getGroupCode()        { return groupCode; }
+    public String getKbCtrl()           { return kbCtrl; }
+    public String getKbAlt()            { return kbAlt; }
+    public String getKbShift()          { return kbShift; }
+    public String getKbKey()            { return kbKey; }
+
+    // ── Setters ───────────────────────────────────────────────────────────────
+
+    public void setScreen(UiScreen screen)              { this.screen = screen; }
+    public void setCode(String code)                    { this.code = code; }
+    public void setLabel(String label)                  { this.label = label; }
+    public void setIcon(String icon)                    { this.icon = icon; }
+    public void setActionType(actionType actionType)        { this.actionType = actionType; }
+    public void setRenderer(String renderer)            { this.renderer = renderer; }
+    public void setHttpMethod(String httpMethod)        { this.httpMethod = httpMethod; }
+    public void setEndpoint(String endpoint)            { this.endpoint = endpoint; }
+    public void setIsEnabled(String isEnabled)          { this.isEnabled = isEnabled; }
+    public void setRequireValidation(String v)          { this.requireValidation = v; }
+    public void setRequireSelection(String v)           { this.requireSelection = v; }
+    public void setWithConfirmation(String v)           { this.withConfirmation = v; }
+    public void setConfirmationMsg(String v)            { this.confirmationMsg = v; }
+    public void setEndAction(String endAction)          { this.endAction = endAction; }
+    public void setConditionExp(String conditionExp)    { this.conditionExp = conditionExp; }
+    public void setColor(String color)                  { this.color = color; }
+    public void setDisplayOrder(Integer displayOrder)   { this.displayOrder = displayOrder; }
+    public void setGroupCode(String groupCode)          { this.groupCode = groupCode; }
+    public void setKbCtrl(String kbCtrl)                { this.kbCtrl = kbCtrl; }
+    public void setKbAlt(String kbAlt)                  { this.kbAlt = kbAlt; }
+    public void setKbShift(String kbShift)              { this.kbShift = kbShift; }
+    public void setKbKey(String kbKey)                  { this.kbKey = kbKey; }
+}

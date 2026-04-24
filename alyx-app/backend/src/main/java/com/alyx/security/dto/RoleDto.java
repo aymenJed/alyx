@@ -11,7 +11,7 @@ public record RoleDto(
     String roleName,
     String roleDescription,
     String roleType,
-    String isActive
+    Boolean isActive
 ) {
     /** Convertit l'entité en DTO. */
     public static RoleDto from(Role e) {

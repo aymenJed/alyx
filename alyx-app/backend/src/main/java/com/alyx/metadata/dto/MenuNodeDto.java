@@ -17,12 +17,12 @@ public record MenuNodeDto(
         String route,
         String screenCode,
         int displayOrder,
-        String isActive,
+        Boolean isActive,
         String roleRequired,
         int childrenCount,
         List<MenuNodeDto> children
 ) {
     public MenuNodeDto(Long menuId, String code, String label, String icon, String route, String screenCode, int displayOrder, List<MenuNodeDto> children) {
-        this(menuId, null, null, code, label, icon, route, screenCode, displayOrder, "Y", null, 0, children);
+        this(menuId, null, null, code, label, icon, route, screenCode, displayOrder, true, null, 0, children);
     }
 }

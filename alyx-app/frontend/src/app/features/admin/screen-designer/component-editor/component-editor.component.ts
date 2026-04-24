@@ -5,7 +5,7 @@ import {
   FormBuilder, FormGroup, ReactiveFormsModule, Validators
 } from '@angular/forms';
 import {
-  ComponentMetadata, ComponentType, VisibilityRule
+  ComponentMetadata, ComponentType
 } from '../../../../core/models/screen-metadata.model';
 
 interface ComponentTypeOption {
@@ -323,7 +323,7 @@ export class ComponentEditorComponent implements OnInit {
       validationRegex:  [c?.validationRegex ?? ''],
       validationMsg:    [c?.validationMsg   ?? ''],
       formatPattern:    [c?.formatPattern   ?? ''],
-      visibilityRuleRaw:[c?.visibilityRule  ? JSON.stringify(c.visibilityRule, null, 2) : ''],
+      visibilityRuleRaw:[c?.visibilityExp ?? ''],
       // Options
       optionsSource:    [c?.optionsSource ?? ''],
       optionsJsonRaw:   [c?.options?.length ? JSON.stringify(c.options, null, 2) : ''],
@@ -333,20 +333,7 @@ export class ComponentEditorComponent implements OnInit {
   save(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
-    // Parse JSON fields
-    let visibilityRule: Record<string, unknown> | null = null;
     let options: unknown[] | null = null;
-
-    const visRaw = this.form.get('visibilityRuleRaw')?.value?.trim();
-    if (visRaw) {
-      try { visibilityRule = JSON.parse(visRaw); this.jsonError.set(''); }
-      catch (e: unknown) {
-        this.jsonError.set(e instanceof Error ? e.message : 'JSON invalide');
-        this.innerTab.set('validation');
-        return;
-      }
-    }
-
     const optRaw = this.form.get('optionsJsonRaw')?.value?.trim();
     if (optRaw) {
       try { options = JSON.parse(optRaw); this.optionsJsonError.set(''); }
@@ -371,6 +358,7 @@ export class ComponentEditorComponent implements OnInit {
       sortable:        v.sortable,
       filterable:      v.filterable,
       gridColumn:      v.gridColumn,
+      fireOnChange:    false,
       displayOrder:    v.displayOrder,
       gridColSpan:     v.gridColSpan,
       validationRegex: v.validationRegex || undefined,
@@ -378,7 +366,7 @@ export class ComponentEditorComponent implements OnInit {
       formatPattern:   v.formatPattern   || undefined,
       optionsSource:   v.optionsSource   || undefined,
       options:         options as { value: string; label: string }[] | undefined,
-      visibilityRule:  visibilityRule as unknown as VisibilityRule ?? undefined,
+      visibilityExp:   v.visibilityRuleRaw || undefined,
     };
 
     this.saved.emit(payload);

@@ -1,19 +1,18 @@
 import {
   AuthService
-} from "./chunk-WG4XWN2K.js";
+} from "./chunk-YXRCPTU6.js";
 import {
-  BrowserModule,
-  DomRendererFactory2,
   Router,
   RouterOutlet,
-  bootstrapApplication,
   provideRouter,
   withComponentInputBinding
-} from "./chunk-Y5NZM7SX.js";
+} from "./chunk-JVNL7PXV.js";
 import {
   ANIMATION_MODULE_TYPE,
+  BrowserModule,
   ChangeDetectionScheduler,
   DOCUMENT,
+  DomRendererFactory2,
   Inject,
   Injectable,
   NgModule,
@@ -21,6 +20,7 @@ import {
   RendererFactory2,
   RuntimeError,
   ViewEncapsulation$1,
+  bootstrapApplication,
   catchError,
   inject,
   performanceMarkFeature,
@@ -37,7 +37,7 @@ import {
   ɵɵdefineNgModule,
   ɵɵelement,
   ɵɵinject
-} from "./chunk-JFHKQIVQ.js";
+} from "./chunk-CMRDFCUM.js";
 import {
   __objRest,
   __spreadValues
@@ -4604,7 +4604,7 @@ var routes = [
   // -------------------------------------------------------
   {
     path: "login",
-    loadComponent: () => import("./login.component-SBLSMUFU.js").then((m) => m.LoginComponent),
+    loadComponent: () => import("./login.component-77KLYDOQ.js").then((m) => m.LoginComponent),
     title: "Alyx \u2014 Connexion"
   },
   // -------------------------------------------------------
@@ -4612,7 +4612,7 @@ var routes = [
   // -------------------------------------------------------
   {
     path: "",
-    loadComponent: () => import("./shell.component-7SVYBZMY.js").then((m) => m.ShellComponent),
+    loadComponent: () => import("./shell.component-IF4J2YK7.js").then((m) => m.ShellComponent),
     canActivate: [authGuard],
     children: [
       // -------------------------------------------------------
@@ -4624,25 +4624,30 @@ var routes = [
         pathMatch: "full"
       },
       // -------------------------------------------------------
-      // ROUTE GÉNÉRIQUE - Pour TOUS les écrans metadata-driven
-      // Cette route capture TOUTES les URLs et charge l'écran
-      // correspondant depuis la base de données
+      // ROUTES EXPLICITES - Composants dédiés (avant le wildcard)
       // -------------------------------------------------------
       {
-        path: ":routePath",
-        loadComponent: () => import("./generic-renderer.component-B4HJ34VE.js").then((m) => m.GenericRendererComponent),
+        path: "admin/parametrage",
+        loadComponent: () => import("./screen-designer.component-DJJ4SOYA.js").then((m) => m.ScreenDesignerComponent),
+        canActivate: [adminGuard],
+        title: "Alyx \u2014 Param\xE9trage des \xE9crans"
+      },
+      {
+        path: "admin/param-menu",
+        loadComponent: () => import("./menu-parametrage.component-QPZ27TNU.js").then((m) => m.MenuParametrageComponent),
+        canActivate: [adminGuard],
+        title: "Alyx \u2014 Param\xE9trage des menus"
+      },
+      // -------------------------------------------------------
+      // ROUTE GÉNÉRIQUE - Pour TOUS les écrans metadata-driven
+      // Doit être en DERNIER : capture tout chemin multi-segment
+      // -------------------------------------------------------
+      {
+        path: "**",
+        loadComponent: () => import("./generic-renderer.component-FJ5W6GXH.js").then((m) => m.GenericRendererComponent),
         title: "Alyx \u2014 Chargement..."
       }
     ]
-  },
-  // -------------------------------------------------------
-  // ROUTES EXPLICITES (optionnel - pour les écrans critiques)
-  // -------------------------------------------------------
-  {
-    path: "admin/parametrage",
-    loadComponent: () => import("./screen-designer.component-TV7QI72F.js").then((m) => m.ScreenDesignerComponent),
-    canActivate: [adminGuard],
-    title: "Alyx \u2014 Param\xE9trage des \xE9crans"
   },
   // -------------------------------------------------------
   // ROUTE WIldcard - Redirection vers la page d'accueil

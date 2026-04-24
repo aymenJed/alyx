@@ -4,5 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record AssignRoleRequest(
         @NotNull(message = "User ID is required")
-        Long userId
+        Long userId,
+        @NotNull(message = "Role ID is required")
+        Long roleId
 ) {}

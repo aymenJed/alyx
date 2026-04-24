@@ -3,20 +3,67 @@ package com.alyx.metadata.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.alyx.metadata.entity.TemplateType;
+
 /**
- * DTO Record Java 22 — Représentation complète d'un écran.
- * Retourné par GET /api/v1/metadata/screens/{code}.
- * Le Frontend construit l'interface entière à partir de cet objet.
+ * DTO complet d'un écran retourné par GET /api/v1/metadata/screens/{code}.
+ *
+ * Aligné sur le modèle de référence PresentationViewModel :
+ * - properties View communes (width, height, refreshTime, caches)
+ * - properties EntityInputView (entityClass, compositionLayout, actionLayout, splitView...)
+ * - properties GridView (pageSize, checkboxSelection, orderBy, criteria...)
+ * - actions  → équivalent ActionElement / Action du modèle de référence
+ * - columns  → équivalent Column / TreeColumn du modèle de référence
+ * - labels   → équivalent EntityLabel / FieldLabel (i18n)
  */
 public record ScreenMetadataDto(
-        Long screenId,
-        String code,
-        String title,
-        String description,
-        String templateType,
-        String apiBaseUrl,
-        Map<String, Object> permissions,
-        Map<String, Object> gridConfig,
+
+        // ── Identité ─────────────────────────────────────────────────────────
+        Long     screenId,
+        String   code,
+        String   title,
+        String   description,
+        TemplateType   templateType,
+        String   apiBaseUrl,
+
+        // ── Propriétés View communes ──────────────────────────────────────────
+        String   caption,
+        Long     width,
+        Long     height,
+        Integer  refreshTime,
+        boolean  serverCache,
+        boolean  clientCache,
+        boolean  maximized,
+
+        // ── Propriétés EntityInputView (FORM / MASTER_DETAIL) ─────────────────
+        String   entityClass,
+        String   criteria,
+        String   orderBy,
+        String   compositionLayout,
+        String   actionLayout,
+        Integer  autoSaveTime,
+        boolean  hasNavigationBar,
+
+        // ── Propriétés SplitView ──────────────────────────────────────────────
+        boolean  isSplitView,
+        String   sizeShare,
+        String   orientation,
+
+        // ── Propriétés GridView (GRID / TREE / CHART) ─────────────────────────
+        Integer  pageSize,
+        boolean  checkboxSelection,
+        boolean  wordWrap,
+        Integer  rowHeight,
+        boolean  disableReportButton,
+        String   actionRenderer,
+
+        // ── Config ChartView / Analytics ─────────────────────────────────────
         Map<String, Object> analyticsConfig,
-        List<ComponentDto> components
+
+        // ── Sous-modèles ─────────────────────────────────────────────────────
+        List<ComponentDto>  components,
+        List<ActionDto>     actions,
+        List<ColumnDto>     columns,
+        Map<String, String> labels
+
 ) {}

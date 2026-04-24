@@ -1,0 +1,14 @@
+package com.alyx.security.dto;
+
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Requête de création pour {@link Role}.
+ * Généré automatiquement — ne pas modifier manuellement.
+ */
+public record CreateRoleRequest(
+    @NotBlank String roleName,
+    String roleDescription,
+    @NotBlank String roleType,
+    @NotBlank Boolean isActive
+) {}

@@ -9,6 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Modèle de vue persisté — équivalent de EntityInputView / EntityGridView / TreeView / ChartView
+ * du modèle de référence PresentationViewModel.
+ *
+ * templateType détermine le comportement rendu côté frontend :
+ *   FORM          → équivalent EntityInputView   (formulaire de saisie)
+ *   GRID          → équivalent EntityGridView    (grille de données paginée)
+ *   TREE          → équivalent TreeView          (vue arborescente)
+ *   CHART         → équivalent ChartView         (graphique)
+ *   TAB           → équivalent TabView           (onglets regroupant d'autres vues)
+ *   SPLIT         → équivalent SplitView         (panneau divisé horizontal/vertical)
+ *   MASTER_DETAIL → composition Form + Grid liés
+ *   ANALYTICS     → équivalent ChartView multi-KPI
+ */
 @Entity
 @Table(name = "UI_SCREEN")
 @AttributeOverride(name = "id",        column = @Column(name = "SCREEN_ID"))
@@ -17,6 +31,8 @@ import java.util.Map;
 @AttributeOverride(name = "createdBy", column = @Column(name = "CREATED_BY", updatable = false, length = 50))
 @AttributeOverride(name = "updatedBy", column = @Column(name = "UPDATED_BY", length = 50))
 public class UiScreen extends BaseEntity {
+
+    // ── Identité ──────────────────────────────────────────────────────────────
 
     @Column(name = "CODE", nullable = false, unique = true, length = 50)
     private String code;
@@ -27,54 +43,204 @@ public class UiScreen extends BaseEntity {
     @Column(name = "DESCRIPTION", length = 1000)
     private String description;
 
+    /** FORM | GRID | TREE | CHART | TAB | SPLIT | MASTER_DETAIL | ANALYTICS */
+    @Enumerated(EnumType.STRING)
     @Column(name = "TEMPLATE_TYPE", nullable = false, length = 20)
-    private String templateType;
+    private TemplateType templateType;
 
     @Column(name = "API_BASE_URL", nullable = false, length = 500)
     private String apiBaseUrl;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "PERMISSIONS", columnDefinition = "jsonb")
-    private Map<String, Object> permissions;
+    // ── Propriétés communes (View interface) ──────────────────────────────────
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "GRID_CONFIG", columnDefinition = "jsonb")
-    private Map<String, Object> gridConfig;
+    @Column(name = "CAPTION", length = 200)
+    private String caption;
+
+    @Column(name = "WIDTH")
+    private Long width;
+
+    @Column(name = "HEIGHT")
+    private Long height;
+
+    /** Intervalle de rafraîchissement automatique en ms (0 = désactivé) */
+    @Column(name = "REFRESH_TIME")
+    private Integer refreshTime;
+
+    @Column(name = "SERVER_CACHE", nullable = false)
+    private Boolean serverCache = false;
+
+    @Column(name = "CLIENT_CACHE", nullable = false)
+    private Boolean clientCache = false;
+
+    @Column(name = "MAXIMIZED", nullable = false)
+    private Boolean maximized = false;
+
+    // ── Propriétés EntityInputView (FORM / MASTER_DETAIL) ────────────────────
+
+    /** Classe Java de l'entité métier affichée (ex: com.alyx.core.tier.entity.Client) */
+    @Column(name = "ENTITY_CLASS", length = 500)
+    private String entityClass;
+
+    /** Critère de filtrage JPQL (ex: "o.active = true") */
+    @Column(name = "CRITERIA", length = 1000)
+    private String criteria;
+
+    /** Clause ORDER BY (ex: "o.nom ASC") */
+    @Column(name = "ORDER_BY", length = 500)
+    private String orderBy;
+
+    /** LABEL_ON_TOP | LABEL_ON_LEFT | LABEL_ON_RIGHT */
+    @Column(name = "COMPOSITION_LAYOUT", length = 20)
+    private String compositionLayout = "LABEL_ON_LEFT";
+
+    /** TOP | BOTTOM | LEFT | RIGHT */
+    @Column(name = "ACTION_LAYOUT", length = 10)
+    private String actionLayout = "TOP";
+
+    /** Intervalle de sauvegarde automatique en ms (0 = désactivé) */
+    @Column(name = "AUTO_SAVE_TIME")
+    private Integer autoSaveTime;
+
+    @Column(name = "HAS_NAVIGATION_BAR", nullable = false)
+    private Boolean hasNavigationBar = true;
+
+    // ── Propriétés SplitView ──────────────────────────────────────────────────
+
+    @Column(name = "IS_SPLIT_VIEW", nullable = false)
+    private Boolean isSplitView = false;
+
+    /** Proportion du panneau principal (ex: "50%", "30%") */
+    @Column(name = "SIZE_SHARE", length = 10)
+    private String sizeShare;
+
+    /** HORIZONTAL | VERTICAL */
+    @Column(name = "ORIENTATION", length = 15)
+    private String orientation;
+
+    // ── Propriétés GridView (GRID / TREE / CHART) ─────────────────────────────
+
+    @Column(name = "PAGE_SIZE")
+    private Integer pageSize = 20;
+
+    @Column(name = "CHECKBOX_SELECTION", nullable = false)
+    private Boolean checkboxSelection = false;
+
+    @Column(name = "WORD_WRAP", nullable = false)
+    private Boolean wordWrap = false;
+
+    @Column(name = "ROW_HEIGHT")
+    private Integer rowHeight;
+
+    @Column(name = "DISABLE_REPORT_BUTTON", nullable = false)
+    private Boolean disableReportButton = false;
+
+    /** BUTTON | LINK | IMAGE — rendu des actions principales */
+    @Column(name = "ACTION_RENDERER", length = 10)
+    private String actionRenderer = "BUTTON";
+
+    // ── Profil / Sécurité ─────────────────────────────────────────────────────
+
+    /** Référence Context-Group-Profile pour la personnalisation multi-profil */
+    @Column(name = "CGP_REFERENCE", length = 100)
+    private String cgpReference;
+
+    @Column(name = "WEIGHT")
+    private Long weight;
+
+    @Column(name = "IS_ACTIVE", nullable = false)
+    private Boolean isActive = true;
+
+    // ── Config JSON (ChartView / Analytics) ──────────────────────────────────
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "ANALYTICS_CONFIG", columnDefinition = "jsonb")
     private Map<String, Object> analyticsConfig;
 
-    @Column(name = "IS_ACTIVE", nullable = false, columnDefinition = "char(1)")
-    private String isActive = "Y";
+    // ── Relations ─────────────────────────────────────────────────────────────
 
-    @OneToMany(mappedBy = "screen", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "screen", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("displayOrder ASC")
     private List<UiComponent> components = new ArrayList<>();
 
-    // --- Getters ---
+    @OneToMany(mappedBy = "screen", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<UiAction> actions = new ArrayList<>();
 
-    public Long getScreenId()                    { return getId(); }
-    public String getCode()                      { return code; }
-    public String getTitle()                     { return title; }
-    public String getDescription()               { return description; }
-    public String getTemplateType()              { return templateType; }
-    public String getApiBaseUrl()                { return apiBaseUrl; }
-    public Map<String, Object> getPermissions()  { return permissions; }
-    public Map<String, Object> getGridConfig()   { return gridConfig; }
+    @OneToMany(mappedBy = "screen", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<UiColumn> columns = new ArrayList<>();
+
+    // ── Getters ───────────────────────────────────────────────────────────────
+
+    public Long getScreenId()               { return getId(); }
+    public String getCode()                 { return code; }
+    public String getTitle()                { return title; }
+    public String getDescription()          { return description; }
+    public TemplateType getTemplateType()         { return templateType; }
+    public String getApiBaseUrl()           { return apiBaseUrl; }
+    public String getCaption()              { return caption; }
+    public Long getWidth()                  { return width; }
+    public Long getHeight()                 { return height; }
+    public Integer getRefreshTime()         { return refreshTime; }
+    public Boolean getServerCache()         { return serverCache; }
+    public Boolean getClientCache()         { return clientCache; }
+    public Boolean getMaximized()           { return maximized; }
+    public String getEntityClass()          { return entityClass; }
+    public String getCriteria()             { return criteria; }
+    public String getOrderBy()              { return orderBy; }
+    public String getCompositionLayout()    { return compositionLayout; }
+    public String getActionLayout()         { return actionLayout; }
+    public Integer getAutoSaveTime()        { return autoSaveTime; }
+    public Boolean getHasNavigationBar()    { return hasNavigationBar; }
+    public Boolean getIsSplitView()         { return isSplitView; }
+    public String getSizeShare()            { return sizeShare; }
+    public String getOrientation()          { return orientation; }
+    public Integer getPageSize()            { return pageSize; }
+    public Boolean getCheckboxSelection()   { return checkboxSelection; }
+    public Boolean getWordWrap()            { return wordWrap; }
+    public Integer getRowHeight()           { return rowHeight; }
+    public Boolean getDisableReportButton() { return disableReportButton; }
+    public String getActionRenderer()       { return actionRenderer; }
+    public String getCgpReference()         { return cgpReference; }
+    public Long getWeight()                 { return weight; }
+    public Boolean getIsActive()            { return isActive; }
     public Map<String, Object> getAnalyticsConfig() { return analyticsConfig; }
-    public String getIsActive()                  { return isActive; }
-    public List<UiComponent> getComponents()     { return components; }
+    public List<UiComponent> getComponents(){ return components; }
+    public List<UiAction> getActions()      { return actions; }
+    public List<UiColumn> getColumns()      { return columns; }
 
-    // --- Setters (used by ScreenDesignerService) ---
+    // ── Setters ───────────────────────────────────────────────────────────────
 
-    public void setCode(String code)                         { this.code = code; }
-    public void setTitle(String title)                       { this.title = title; }
-    public void setDescription(String description)           { this.description = description; }
-    public void setTemplateType(String templateType)         { this.templateType = templateType; }
-    public void setApiBaseUrl(String apiBaseUrl)             { this.apiBaseUrl = apiBaseUrl; }
-    public void setPermissions(Map<String, Object> p)        { this.permissions = p; }
-    public void setGridConfig(Map<String, Object> g)         { this.gridConfig = g; }
-    public void setAnalyticsConfig(Map<String, Object> a)    { this.analyticsConfig = a; }
-    public void setIsActive(String isActive)                 { this.isActive = isActive; }
+    public void setCode(String code)                        { this.code = code; }
+    public void setTitle(String title)                      { this.title = title; }
+    public void setDescription(String description)          { this.description = description; }
+    public void setTemplateType(TemplateType templateType)        { this.templateType = templateType; }
+    public void setApiBaseUrl(String apiBaseUrl)            { this.apiBaseUrl = apiBaseUrl; }
+    public void setCaption(String caption)                  { this.caption = caption; }
+    public void setWidth(Long width)                        { this.width = width; }
+    public void setHeight(Long height)                      { this.height = height; }
+    public void setRefreshTime(Integer refreshTime)         { this.refreshTime = refreshTime; }
+    public void setServerCache(Boolean serverCache)         { this.serverCache = serverCache; }
+    public void setClientCache(Boolean clientCache)         { this.clientCache = clientCache; }
+    public void setMaximized(Boolean maximized)             { this.maximized = maximized; }
+    public void setEntityClass(String entityClass)          { this.entityClass = entityClass; }
+    public void setCriteria(String criteria)                { this.criteria = criteria; }
+    public void setOrderBy(String orderBy)                  { this.orderBy = orderBy; }
+    public void setCompositionLayout(String v)              { this.compositionLayout = v; }
+    public void setActionLayout(String actionLayout)        { this.actionLayout = actionLayout; }
+    public void setAutoSaveTime(Integer autoSaveTime)       { this.autoSaveTime = autoSaveTime; }
+    public void setHasNavigationBar(Boolean v)              { this.hasNavigationBar = v; }
+    public void setIsSplitView(Boolean isSplitView)         { this.isSplitView = isSplitView; }
+    public void setSizeShare(String sizeShare)              { this.sizeShare = sizeShare; }
+    public void setOrientation(String orientation)          { this.orientation = orientation; }
+    public void setPageSize(Integer pageSize)               { this.pageSize = pageSize; }
+    public void setCheckboxSelection(Boolean v)             { this.checkboxSelection = v; }
+    public void setWordWrap(Boolean wordWrap)               { this.wordWrap = wordWrap; }
+    public void setRowHeight(Integer rowHeight)             { this.rowHeight = rowHeight; }
+    public void setDisableReportButton(Boolean v)           { this.disableReportButton = v; }
+    public void setActionRenderer(String actionRenderer)    { this.actionRenderer = actionRenderer; }
+    public void setCgpReference(String cgpReference)        { this.cgpReference = cgpReference; }
+    public void setWeight(Long weight)                      { this.weight = weight; }
+    public void setIsActive(Boolean isActive)               { this.isActive = isActive; }
+    public void setAnalyticsConfig(Map<String, Object> a)   { this.analyticsConfig = a; }
 }

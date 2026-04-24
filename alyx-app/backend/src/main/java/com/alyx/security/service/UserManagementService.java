@@ -56,7 +56,7 @@ public class UserManagementService {
         user.setFullName(req.fullName());
         user.setEmail(req.email());
         user.setRoles(normalizeRoles(req.roles()));
-        user.setIsActive(req.isActive() != null ? req.isActive() : "Y");
+        user.setIsActive(req.isActive() != null ? req.isActive() : true);
         return UserDto.from(userRepo.save(user));
     }
 
@@ -75,13 +75,33 @@ public class UserManagementService {
         return UserDto.from(userRepo.save(user));
     }
 
-    // ── TOGGLE ──────────────────────────────────────────────────
+    // ── TOGGLE / STATUS ─────────────────────────────────────────
 
     public void toggleActive(Long id) {
         AppUser user = userRepo.findById(id)
             .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
-        user.setIsActive("Y".equals(user.getIsActive()) ? "N" : "Y");
+        user.setIsActive(!Boolean.TRUE.equals(user.getIsActive()));
         userRepo.save(user);
+    }
+
+    public void setActive(Long id, Boolean status) {
+        AppUser user = userRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
+        user.setIsActive(status);
+        userRepo.save(user);
+    }
+
+    public void resetPassword(Long id) {
+        AppUser user = userRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
+        user.setPassword(encoder.encode("Alyx@2025"));
+        userRepo.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<UserDto> searchAutocomplete(String q) {
+        return userRepo.search(q, org.springframework.data.domain.PageRequest.of(0, 10))
+            .stream().map(UserDto::from).toList();
     }
 
     // ── DELETE ──────────────────────────────────────────────────
